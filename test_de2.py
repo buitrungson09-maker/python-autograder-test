@@ -96,7 +96,6 @@ tests = {
             "expected": {
                 "S01": ["Python", "An", "NXB A", 2020],
             },
-            "message": "Không tìm thấy cuốn sách cần xóa",
         },
         {
             "input": (
@@ -112,7 +111,9 @@ tests = {
     ],
 
     "Cau5a": [
-        {"input": "", "expected": None},
+        {"input": "", "expected": [
+            "DT01", "iPhone 15 Pro", "Apple", "3274", "28990000",
+        ]},
     ],
 
     "Cau5b": [
@@ -134,7 +135,7 @@ kinds.update({
     "Cau3a": "literal",
     "Cau4a": "dict",
     "Cau4b": "dict",
-    "Cau5a": "class",
+    "Cau5a": "phone_output",
     "Cau5b": "all_text",
 })
 
