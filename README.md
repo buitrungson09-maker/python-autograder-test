@@ -103,14 +103,14 @@ python autograde_de2.py "D:\duong-dan\bai-lam"
 | Dạng bài | Cách kiểm tra |
 | :--- | :--- |
 | Kết quả số | So sánh số cuối trong đầu ra; cho phép sai số `1e-6` |
-| Chuỗi đối xứng | Kiểm tra thông báo ở cuối dòng |
+| Chuỗi đối xứng | Chấp nhận có/không dấu, thông báo ngắn, True/False hoặc 1/0 |
 | List và dictionary | Đọc cấu trúc dữ liệu từ đầu ra rồi so sánh giá trị |
-| Lớp DienThoai | Tạo đối tượng thử, kiểm tra thuộc tính và phương thức hiển thị |
+| Câu 5a | Chỉ chấm thông tin điện thoại được in; có hỗ trợ gọi lớp cũ để lấy đầu ra |
 | Hai điện thoại mẫu | Kiểm tra đầu ra chứa đầy đủ các giá trị yêu cầu |
 
 Mỗi test có thời hạn **3 giây**. Bài thiếu file, gặp lỗi chạy hoặc quá thời gian không được điểm ở test tương ứng. Điểm từng ý tính theo tỷ lệ test đúng nhân trọng số.
 
-Bộ chấm kiểm tra kết quả; những yêu cầu như cách viết hàm và lựa chọn thuật toán vẫn cần tự đối chiếu với đề.
+Bộ chấm chỉ xét kết quả đầu ra, không bắt buộc tên hàm, biến, thuộc tính hay thuật toán. Câu 5a chấp nhận in trực tiếp đủ thông tin DT01; nếu bài cũ chỉ khai báo lớp `DienThoai`, bộ chấm sẽ gọi lớp để lấy đầu ra. List/dict vẫn phải biểu diễn đúng dữ liệu mong đợi. Khi nộp bài, tự đối chiếu thêm yêu cầu viết hàm và lớp trong đề gốc.
 
 <details>
 <summary><strong>📝 Quy ước nhập/xuất để luyện từng ý độc lập</strong></summary>
@@ -118,11 +118,11 @@ Bộ chấm kiểm tra kết quả; những yêu cầu như cách viết hàm v�
 - **Câu 1a:** nhập lại đến khi `1 <= n <= 1500`, cuối cùng in n hợp lệ.
 - **Câu 1b, 1c:** mỗi file tự nhập n.
 - **Câu 2:** mỗi ý tự nhập chuỗi; đếm hoặc tính tổng được 0 thì in số 0.
-- **Câu 2b:** in `Chuỗi đối xứng` hoặc `Chuỗi không đối xứng`; phân biệt hoa/thường khi xét chuỗi.
+- **Câu 2b:** có thể in `Doi xung` / `Khong doi xung`, thông báo có dấu, hoặc `True` / `False` (tương ứng `1` / `0`); vẫn phân biệt hoa/thường khi xét chuỗi đầu vào.
 - **Câu 3:** mỗi ý tự nhập các số, mỗi số một dòng; nhập 0 để dừng, không thêm số 0 kết thúc vào list. Ý 3c nhập thêm k sau đó.
 - **Câu 4:** nhập số lượng sách rồi lần lượt nhập mã, tên, tác giả, nhà xuất bản và năm của mỗi cuốn. Năm là số nguyên. Dùng dict dạng `{"S01": ["Python", "An", "NXB A", 2020]}`.
-- **Câu 4b:** nhập thêm mã cần xóa; in dict cuối cùng sau khi xử lý. Nếu không có mã, in `Không tìm thấy cuốn sách cần xóa`.
-- **Câu 5a:** khai báo lớp `DienThoai` với `__init__` và `thongtindienthoai`.
+- **Câu 4b:** nhập thêm mã cần xóa; in dict cuối cùng sau khi xử lý. Nếu không có mã, chỉ cần giữ đúng dict cuối cùng; thông báo không bắt buộc.
+- **Câu 5a:** in đủ `DT01`, `iPhone 15 Pro`, `Apple`, `3274`, `28990000`, hoặc giữ lớp `DienThoai` và phương thức hiển thị như bài cũ để bộ chấm gọi lấy đầu ra.
 - **Câu 5b:** có thể lấy lớp bằng `from Cau5a import DienThoai`; hai file phải cùng thư mục.
 
 In list/dict trên một dòng để bộ chấm đọc được. Các quy ước này giúp chấm riêng từng ý, cụ thể hóa đầu ra của bài luyện.
@@ -136,7 +136,7 @@ In list/dict trên một dòng để bộ chấm đọc được. Các quy ướ
 | Không mở được `autograde_de2.py` | Kiểm tra Terminal đang ở thư mục gốc repo |
 | Báo thiếu file bài làm | Kiểm tra tên file và vị trí trong `submissions_de2` |
 | Đầu ra rỗng | Lưu file, kiểm tra đã gọi hàm và có lệnh `print` |
-| `KeyError: 'DienThoai'` | Kiểm tra đã khai báo đúng tên lớp trong `Cau5a.py` |
+| Câu 5a không có đầu ra | In đủ thông tin DT01, hoặc dùng lớp và phương thức hiển thị của bài cũ |
 | Không tìm thấy list/dict hợp lệ | In cấu trúc bằng `print(danh_sach)` hoặc `print(thu_vien)` |
 | Quá thời gian | Kiểm tra điều kiện dừng vòng lặp và số lần nhập dữ liệu |
 
