@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import unicodedata
 
 from test_de2 import tests, kinds, weights
 
@@ -13,7 +14,11 @@ ROOT = Path(__file__).resolve().parent
 
 
 def normalize(text):
-    return " ".join(str(text).casefold().split()).rstrip(".!:")
+    # Chap nhan ca tieng Viet co dau va khong dau.
+    text = str(text).casefold().replace("\u0111", "d")
+    text = unicodedata.normalize("NFD", text)
+    text = "".join(char for char in text if not unicodedata.combining(char))
+    return " ".join(text.split()).rstrip(".!:")
 
 
 def last_literal(output, literal_type):
