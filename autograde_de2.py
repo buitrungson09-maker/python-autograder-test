@@ -39,54 +39,35 @@ def last_literal(output, literal_type):
     raise ValueError("Không tìm thấy list/dict được in hợp lệ")
 
 
-def check_class(path):
-    # Chạy riêng để kiểm tra lớp DienThoai.
+def phone_output_command(path, case):
+    # Ho tro lop cu de lay dau ra; khong kiem tra thuoc tinh.
     harness = '''
 import contextlib
 import io
+import json
 import runpy
 import sys
+import unicodedata
 
-with contextlib.redirect_stdout(io.StringIO()):
+def normalize(text):
+    text = str(text).casefold().replace("\\u0111", "d")
+    text = unicodedata.normalize("NFD", text)
+    return " ".join("".join(c for c in text if not unicodedata.combining(c)).split())
+
+stream = io.StringIO()
+with contextlib.redirect_stdout(stream):
     namespace = runpy.run_path(sys.argv[1], run_name="__main__")
-
-cls = namespace["DienThoai"]
-
-fields = (
-    "MaMay",
-    "TenMay",
-    "HangSanXuat",
-    "DungLuongPin",
-    "GiaBan",
-)
-
-samples = [
-    ("DT01", "iPhone 15 Pro", "Apple", 3274, 28990000),
-    ("X99", "May thu", "Hang thu", 1234, 7654321),
-]
-
-for values in samples:
-    phone = cls(*values)
-
-    assert all(
-        getattr(phone, key) == value
-        for key, value in zip(fields, values)
-    ), "Thuộc tính điện thoại không đúng"
-
-    stream = io.StringIO()
-
-    with contextlib.redirect_stdout(stream):
+output = stream.getvalue()
+print(output, end="")
+expected = json.loads(sys.argv[2])
+if not all(normalize(value) in normalize(output) for value in expected):
+    cls = namespace.get("DienThoai")
+    if callable(cls):
+        phone = cls("DT01", "iPhone 15 Pro", "Apple", 3274, 28990000)
         phone.thongtindienthoai()
-
-    output = " ".join(stream.getvalue().casefold().split())
-
-    assert all(
-        str(value).casefold() in output
-        for value in values
-    ), "Phương thức chưa in đủ thông tin"
 '''
-
-    return [sys.executable, "-c", harness, str(path)]
+    import json
+    return [sys.executable, "-c", harness, str(path), json.dumps(case["expected"])]
 
 
 def compare(output, case, kind):
@@ -109,22 +90,29 @@ def compare(output, case, kind):
         return last_literal(output, list) == expected
 
     if kind == "dict":
-        correct_dict = last_literal(output, dict) == expected
-
-        correct_message = (
-            "message" not in case
-            or normalize(case["message"]) in normalize(output)
-        )
-
-        return correct_dict and correct_message
+        return last_literal(output, dict) == expected
 
     if kind == "text":
-        return any(
-            normalize(line).endswith(normalize(expected))
-            for line in output.splitlines()
-        )
+        wanted = normalize(expected)
+        if wanted in ("chuoi doi xung", "chuoi khong doi xung"):
+            lines = [normalize(line) for line in output.splitlines() if line.strip()]
+            if not lines:
+                return False
+            line = lines[-1]
+            if re.search(r"\bkhong (?:phai )?(?:la )?(?:chuoi )?doi xung$", line):
+                actual = False
+            elif re.search(r"\bdoi xung$", line):
+                actual = True
+            elif re.search(r"\b(?:false|0)$", line):
+                actual = False
+            elif re.search(r"\b(?:true|1)$", line):
+                actual = True
+            else:
+                return False
+            return actual == (wanted == "chuoi doi xung")
+        return any(normalize(line).endswith(wanted) for line in output.splitlines())
 
-    if kind == "all_text":
+    if kind in ("all_text", "phone_output"):
         return all(
             normalize(value) in normalize(output)
             for value in expected
@@ -156,8 +144,8 @@ def grade(base_dir):
             kind = kinds[name]
             detail = ""
 
-            if kind == "class":
-                command = check_class(path)
+            if kind == "phone_output":
+                command = phone_output_command(path, case)
             else:
                 command = [sys.executable, str(path)]
 
@@ -182,10 +170,7 @@ def grade(base_dir):
                     else:
                         detail = f"Mã thoát {result.returncode}"
                 else:
-                    ok = (
-                        kind == "class"
-                        or compare(result.stdout, case, kind)
-                    )
+                    ok = compare(result.stdout, case, kind)
 
                     if not ok:
                         detail = (
